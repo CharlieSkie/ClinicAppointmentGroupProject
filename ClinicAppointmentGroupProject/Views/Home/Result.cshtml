@@ -1,0 +1,232 @@
+﻿@model IEnumerable<ClinicAppointmentGroupProject.Models.Patient>
+
+@{
+    ViewData["Title"] = "Appointments";
+    Layout = "_Layout";
+}
+
+<div class="result-container mt-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold result-title mb-3 mb-md-0">📋 Appointment List</h2>
+        <a asp-action="Create" class="btn btn-success px-3 result-add-btn">➕ New Appointment</a>
+    </div>
+
+    <!-- Search Box -->
+    <form method="get" asp-action="Index" class="mb-4">
+        <div class="input-group shadow-sm">
+            <input type="text" name="search" class="form-control result-search"
+                   placeholder="🔍 Search by Patient Name or Department" />
+            <button type="submit" class="btn btn-outline-primary result-search-btn">Search</button>
+        </div>
+    </form>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info text-center shadow-sm">
+            No appointments found. Click <strong>“New Appointment”</strong> to add one.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-lg rounded-4 overflow-hidden">
+            <table class="table table-hover align-middle result-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Appointment ID</th>
+                        <th>Patient Name</th>
+                        <th>Department</th>
+                        <th>Appointment Date</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="badge result-badge">@item.appointmentId</span></td>
+                            <td class="result-text">@item.patientName</td>
+                            <td class="result-text">@item.department</td>
+                            <td class="result-text">@item.AppointmentDate.ToString("yyyy-MM-dd")</td>
+                            <td class="text-center">
+                                <a asp-action="Edit" asp-route-id="@item.appointmentId"
+                                   class="btn btn-warning btn-sm me-1 result-edit-btn">✏ Edit</a>
+
+                                <form asp-action="Delete" asp-route-id="@item.appointmentId"
+                                      method="post"
+                                      style="display:inline;"
+                                      onsubmit="return confirm('Are you sure you want to delete this appointment?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-danger btn-sm result-delete-btn">🗑 Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<style>
+    /* Smooth transitions */
+    .result-container, .result-table, .result-title, .result-add-btn,
+    .result-search, .result-search-btn, .result-text, .result-badge {
+        transition: all 0.4s ease;
+    }
+
+    /* ===== LIGHT THEME ===== */
+    [data-bs-theme="light"] .result-container {
+        background-color: #ffffff;
+        color: #212529;
+    }
+
+    [data-bs-theme="light"] .result-title {
+        color: #0d6efd;
+    }
+
+    [data-bs-theme="light"] .result-table thead {
+        background-color: #0d6efd;
+        color: #fff;
+    }
+
+    [data-bs-theme="light"] .result-table tbody tr {
+        background-color: #fff;
+        color: #212529;
+    }
+
+        [data-bs-theme="light"] .result-table tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+
+    [data-bs-theme="light"] .result-text {
+        color: #212529;
+    }
+
+    [data-bs-theme="light"] .result-badge {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    [data-bs-theme="light"] .result-add-btn {
+        background-color: #198754;
+        color: #fff;
+        border: none;
+    }
+
+        [data-bs-theme="light"] .result-add-btn:hover {
+            background-color: #157347;
+        }
+
+    [data-bs-theme="light"] .result-edit-btn {
+        background-color: #ffc107;
+        color: #212529;
+        border: none;
+    }
+
+        [data-bs-theme="light"] .result-edit-btn:hover {
+            background-color: #e0a800;
+            color: #fff;
+        }
+
+    [data-bs-theme="light"] .result-delete-btn {
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+    }
+
+        [data-bs-theme="light"] .result-delete-btn:hover {
+            background-color: #bb2d3b;
+        }
+
+    /* ===== DARK THEME ===== */
+    [data-bs-theme="dark"] .result-container {
+        background-color: #181818;
+        color: #f1f1f1;
+    }
+
+    [data-bs-theme="dark"] .result-title {
+        color: #66b2ff;
+    }
+
+    [data-bs-theme="dark"] .result-table thead {
+        background-color: #1f1f1f;
+        color: #66b2ff;
+    }
+
+    [data-bs-theme="dark"] .result-table tbody tr {
+        background-color: #181818;
+        color: #eaeaea;
+        border-color: #333;
+    }
+
+        [data-bs-theme="dark"] .result-table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+    [data-bs-theme="dark"] .result-text {
+        color: #eaeaea;
+    }
+
+    [data-bs-theme="dark"] .result-badge {
+        background-color: #444;
+        color: #66b2ff;
+    }
+
+    [data-bs-theme="dark"] .result-add-btn {
+        background-color: #198754;
+        color: #fff;
+        border: none;
+    }
+
+        [data-bs-theme="dark"] .result-add-btn:hover {
+            background-color: #157347;
+        }
+
+    [data-bs-theme="dark"] .result-edit-btn {
+        background-color: #f0ad4e;
+        color: #121212;
+        border: none;
+    }
+
+        [data-bs-theme="dark"] .result-edit-btn:hover {
+            background-color: #ec971f;
+            color: white;
+        }
+
+    [data-bs-theme="dark"] .result-delete-btn {
+        background-color: #d9534f;
+        color: #fff;
+        border: none;
+    }
+
+        [data-bs-theme="dark"] .result-delete-btn:hover {
+            background-color: #c9302c;
+        }
+
+    /* ===== RESPONSIVE ===== */
+    @@media (max-width: 768px) {
+        .result-container
+
+    {
+        padding: 1rem;
+    }
+
+    .result-title {
+        font-size: 1.3rem;
+    }
+
+    .result-table th, .result-table td {
+        font-size: 0.9rem;
+    }
+
+    .result-add-btn, .result-edit-btn, .result-delete-btn {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .input-group input {
+        font-size: 0.9rem;
+    }
+
+    }
+</style>

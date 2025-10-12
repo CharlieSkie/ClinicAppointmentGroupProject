@@ -1,0 +1,59 @@
+﻿@model ClinicAppointmentGroupProject.Models.Patient
+
+@{
+    ViewData["Title"] = "Edit Appointment";
+}
+
+<div class="card shadow-lg p-4 mx-auto" style="max-width: 600px;">
+    <h3 class="text-center mb-4 fw-bold">✏ Edit Appointment</h3>
+
+    <form asp-action="Edit" method="post">
+        <!-- Hidden input for ID -->
+        <input type="hidden" asp-for="appointmentId" />
+
+        <!-- Appointment ID (readonly) -->
+        <div class="mb-3">
+            <label asp-for="appointmentId" class="form-label fw-semibold">Appointment ID</label>
+            <input asp-for="appointmentId" class="form-control" readonly />
+            <span asp-validation-for="appointmentId" class="text-danger"></span>
+        </div>
+
+        <!-- Patient Name -->
+        <div class="mb-3">
+            <label asp-for="patientName" class="form-label fw-semibold">Patient Name</label>
+            <input asp-for="patientName" class="form-control" placeholder="Enter patient name" />
+            <span asp-validation-for="patientName" class="text-danger"></span>
+        </div>
+
+        <!-- Department -->
+        <div class="mb-3">
+            <label asp-for="department" class="form-label fw-semibold">Department</label>
+            <select asp-for="department" class="form-select">
+                <option value="">-- Select Department --</option>
+                <option>General Medicine</option>
+                <option>Pediatrics</option>
+                <option>Orthopedics</option>
+                <option>Dermatology</option>
+                <option>Cardiology</option>
+            </select>
+            <span asp-validation-for="department" class="text-danger"></span>
+        </div>
+
+        <!-- Appointment Date -->
+        <div class="mb-3">
+            <label asp-for="AppointmentDate" class="form-label fw-semibold">Appointment Date</label>
+            <input asp-for="AppointmentDate" class="form-control" type="date" />
+            <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-action="Result" class="btn btn-outline-secondary px-4">⬅ Back</a>
+            <button type="submit" class="btn btn-primary px-4">💾 Save Changes</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

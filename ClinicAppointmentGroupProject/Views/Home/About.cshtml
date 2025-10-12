@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "About";
+}
+
+<div class="card shadow-lg p-4 mx-auto theme-card mt-5" style="max-width: 800px;">
+    <h2 class="fw-bold mb-3 text-center">🏥 About Our Clinic</h2>
+
+    <p class="lead text-center mb-4">
+        Welcome to our modern Clinic Appointment Management System — designed to make healthcare scheduling effortless.
+    </p>
+
+    <div class="row text-center">
+        <div class="col-md-4 mb-3">
+            <div class="p-3 border rounded-3 feature-box bg-primary-subtle text-primary-emphasis">
+                <h5>💉 Quality Care</h5>
+                <p>We ensure every patient receives the best possible service and attention.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="p-3 border rounded-3 feature-box bg-success-subtle text-success-emphasis">
+                <h5>⏱️ Easy Booking</h5>
+                <p>Our system makes scheduling fast, simple, and stress-free.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="p-3 border rounded-3 feature-box bg-info-subtle text-info-emphasis">
+                <h5>👩‍⚕️ Expert Doctors</h5>
+                <p>Our medical team is composed of certified and experienced professionals.</p>
+            </div>
+        </div>
+    </div>
+
+    <!--
+    <div class="text-center mt-4">
+        <a asp-action="Index" class="btn btn-outline-primary px-4">⬅ Back to Home</a>
+    </div>
+    -->
+
+</div>
+
+<style>
+    /* Smooth theme transition for the About page */
+    .theme-card, .feature-box {
+        transition: all 0.4s ease;
+    }
+
+    /* Dark mode customization */
+    [data-bs-theme="dark"] .theme-card {
+        background-color: #1e1e1e;
+        color: #f1f1f1;
+    }
+
+    [data-bs-theme="dark"] .feature-box {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Light mode customization */
+    [data-bs-theme="light"] .theme-card {
+        background-color: #ffffff;
+        color: #212529;
+    }
+
+    [data-bs-theme="light"] .feature-box {
+        background-color: rgba(0, 0, 0, 0.03);
+        color: #212529;
+        border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-outline-primary {
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-primary:hover {
+            background-color: var(--bs-primary);
+            color: white;
+        }
+</style>

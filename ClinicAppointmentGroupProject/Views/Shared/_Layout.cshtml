@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Clinic Appointment System</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ClinicAppointmentGroupProject.styles.css" asp-append-version="true" />
+
+    <style>
+        /* ===== GENERAL LAYOUT ===== */
+        body {
+            display: flex;
+            margin: 0;
+            min-height: 100vh;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .content {
+            margin-left: 250px;
+            flex-grow: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link {
+            border-radius: 8px;
+            margin: 3px 12px;
+            transition: all 0.2s ease;
+        }
+
+            .nav-link:hover {
+                transform: translateX(5px);
+            }
+
+            .nav-link.active {
+                font-weight: bold;
+                background-color: rgba(13, 110, 253, 0.15);
+            }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* ===== DARK THEME ===== */
+        [data-bs-theme="dark"] .sidebar {
+            background-color: #121212;
+            color: #f8f9fa;
+        }
+
+            [data-bs-theme="dark"] .sidebar a {
+                color: #ddd;
+            }
+
+                [data-bs-theme="dark"] .sidebar a:hover {
+                    background-color: #1e1e1e;
+                    color: #66b2ff;
+                }
+
+        [data-bs-theme="dark"] .content {
+            background-color: #181818;
+            color: #f1f1f1;
+        }
+
+        [data-bs-theme="dark"] footer {
+            background-color: #121212;
+            color: #aaa;
+        }
+
+        /* ===== LIGHT THEME ===== */
+        [data-bs-theme="light"] .sidebar {
+            background-color: #ffffff;
+            color: #212529;
+            border-right: 1px solid #dee2e6;
+        }
+
+            [data-bs-theme="light"] .sidebar a {
+                color: #212529;
+            }
+
+                [data-bs-theme="light"] .sidebar a:hover {
+                    background-color: #e9ecef;
+                    color: #0d6efd;
+                }
+
+        [data-bs-theme="light"] .content {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        [data-bs-theme="light"] footer {
+            background-color: #ffffff;
+            color: #6c757d;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @@media (max-width: 992px) {
+            .sidebar
+
+        {
+            left: -250px;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .content {
+            margin-left: 0;
+        }
+
+        #menuToggle {
+            display: inline-block;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 1100;
+            font-size: 1.6rem;
+            cursor: pointer;
+        }
+
+        }
+    </style>
+</head>
+
+<body class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+            <h4 class="fw-bold mb-0">🏥 Clinic</h4>
+            <button id="themeToggle" class="theme-toggle" title="Toggle Theme">🌙</button>
+        </div>
+
+        <nav class="nav flex-column mt-3">
+            <a class="nav-link px-4 py-2" asp-controller="Home" asp-action="Index">🏠 Home</a>
+            <a class="nav-link px-4 py-2" asp-controller="Home" asp-action="About">ℹ️ About</a>
+            <a class="nav-link px-4 py-2" asp-controller="Home" asp-action="Create">➕ Create Appointment</a>
+            <a class="nav-link px-4 py-2" asp-controller="Home" asp-action="Result">📋 Appointment List</a>
+        </nav>
+    </div>
+
+    <!-- Menu Toggle for Mobile -->
+    <div id="menuToggle" class="text-light d-lg-none">☰</div>
+
+    <!-- Content -->
+    <div class="content">
+        <main role="main" class="flex-grow-1 pb-3">
+            @RenderBody()
+        </main>
+
+        <footer class="small">
+            &copy; @DateTime.Now.Year - Clinic Appointment Management System
+        </footer>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sidebar toggle for small screens
+        const menuToggle = document.getElementById("menuToggle");
+        const sidebar = document.querySelector(".sidebar");
+        menuToggle?.addEventListener("click", () => {
+            sidebar.classList.toggle("active");
+        });
+
+        // Theme toggle logic
+        const themeToggle = document.getElementById("themeToggle");
+        const html = document.documentElement;
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        html.setAttribute("data-bs-theme", savedTheme);
+        updateIcon();
+
+        themeToggle.addEventListener("click", () => {
+            const currentTheme = html.getAttribute("data-bs-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            html.setAttribute("data-bs-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+            updateIcon();
+        });
+
+        function updateIcon() {
+            const currentTheme = html.getAttribute("data-bs-theme");
+            themeToggle.textContent = currentTheme === "dark" ? "☀️" : "🌙";
+        }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

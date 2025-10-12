@@ -1,0 +1,132 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container mt-5 text-center home-container">
+    <h1 class="display-4 fw-bold mb-3 home-title">🏥 Welcome to Our Clinic</h1>
+    <p class="lead home-subtitle">
+        Providing quality healthcare and seamless appointment scheduling for everyone.
+    </p>
+
+    <hr class="my-4 home-divider" />
+
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <div class="card home-card shadow-lg border-0 rounded-4">
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-3 fw-semibold home-card-title">💡 About Our Clinic</h4>
+                    <p class="card-text home-card-text">
+                        Our clinic is committed to delivering excellent medical care across various departments,
+                        including <strong>General Medicine</strong>, <strong>Pediatrics</strong>,
+                        <strong>Orthopedics</strong>, <strong>Dermatology</strong>, and <strong>Cardiology</strong>.
+                    </p>
+
+                    <a asp-controller="Home" asp-action="Create"
+                       class="btn home-btn mt-3 px-4 py-2 fw-semibold shadow-sm">
+                        📅 Manage Appointments
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Smooth transition for theme switching */
+    .home-container, .home-card, .home-footer, .home-title, .home-subtitle {
+        transition: all 0.4s ease;
+    }
+
+    /* ===== Light Theme ===== */
+    [data-bs-theme="light"] .home-container {
+        background-color: #f8f9fa;
+        color: #212529;
+    }
+
+    [data-bs-theme="light"] .home-title {
+        color: #0d6efd;
+    }
+
+    [data-bs-theme="light"] .home-subtitle {
+        color: #6c757d;
+    }
+
+    [data-bs-theme="light"] .home-card {
+        background-color: #ffffff;
+        color: #212529;
+    }
+
+    [data-bs-theme="light"] .home-card-title {
+        color: #0d6efd;
+    }
+
+    [data-bs-theme="light"] .home-card-text .highlight {
+        color: #0d6efd;
+        font-weight: 600;
+    }
+
+    [data-bs-theme="light"] .home-btn {
+        border: 2px solid #0d6efd;
+        color: #0d6efd;
+        background-color: transparent;
+    }
+
+        [data-bs-theme="light"] .home-btn:hover {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+
+    [data-bs-theme="light"] .home-footer {
+        color: #6c757d;
+    }
+
+    /* ===== Dark Theme ===== */
+    [data-bs-theme="dark"] .home-container {
+        background-color: #121212;
+        color: #f1f1f1;
+    }
+
+    [data-bs-theme="dark"] .home-title {
+        color: #66b2ff;
+    }
+
+    [data-bs-theme="dark"] .home-subtitle {
+        color: #bbbbbb;
+    }
+
+    [data-bs-theme="dark"] .home-card {
+        background-color: rgba(40, 40, 40, 0.95);
+        backdrop-filter: blur(8px);
+        color: #e0e0e0;
+    }
+
+    [data-bs-theme="dark"] .home-card-title {
+        color: #66b2ff;
+    }
+
+    [data-bs-theme="dark"] .home-card-text .highlight {
+        color: #66b2ff;
+        font-weight: 600;
+    }
+
+    [data-bs-theme="dark"] .home-btn {
+        border: 2px solid #66b2ff;
+        color: #66b2ff;
+        background-color: transparent;
+    }
+
+        [data-bs-theme="dark"] .home-btn:hover {
+            background-color: #66b2ff;
+            color: #121212;
+        }
+
+    [data-bs-theme="dark"] .home-footer {
+        color: #aaaaaa;
+    }
+
+    /* Divider styling */
+    .home-divider {
+        width: 60%;
+        margin: 0 auto;
+    }
+</style>
