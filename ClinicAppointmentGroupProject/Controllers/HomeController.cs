@@ -1,7 +1,7 @@
 using ClinicAppointmentGroupProject.Models;
 
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+//using System.Linq;
 
 namespace ClinicAppointmentGroupProject.Controllers
 {
