@@ -4,14 +4,32 @@ namespace ClinicAppointmentGroupProject.Models
 {
     public class Patient
     {
-
         [Key]
-        public required string appointmentId { get; set; } 
+        public string appointmentId { get; set; } = string.Empty;
 
-        public required string patientName { get; set; }
-        public required string department { get; set; }
+        [Required]
+        public string patientName { get; set; } = string.Empty;
 
-        public DateOnly AppointmentDate { get; set; }
+        [Required]
+        public string department { get; set; } = string.Empty;
 
+        public DateTime AppointmentDate { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        public string? DoctorId { get; set; }
+        public virtual ApplicationUser? Doctor { get; set; }
+
+        public string? ClientUserId { get; set; }
+        public virtual ApplicationUser? ClientUser { get; set; }
+
+        public AppointmentStatus Status { get; set; } = AppointmentStatus.Pending;
+    }
+
+    public enum AppointmentStatus
+    {
+        Pending,
+        Confirmed,
+        Completed,
+        Cancelled
     }
 }

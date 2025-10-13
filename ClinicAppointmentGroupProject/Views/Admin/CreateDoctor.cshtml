@@ -1,0 +1,67 @@
+﻿@model ClinicAppointmentGroupProject.Controllers.CreateDoctorViewModel
+@{
+    ViewData["Title"] = "Add New Doctor";
+    Layout = "_Layout";
+}
+
+<div class="d-flex justify-content-center align-items-center mt-4">
+    <div class="card shadow-lg p-4 w-100" style="max-width: 600px;">
+        <h3 class="text-center mb-4 fw-bold">👨‍⚕️ Add New Doctor</h3>
+
+        <form asp-action="CreateDoctor" method="post">
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label fw-semibold">Full Name</label>
+                <input asp-for="FullName" class="form-control" placeholder="Enter doctor's full name" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label fw-semibold">Email Address</label>
+                <input asp-for="Email" class="form-control" placeholder="Enter email address" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Specialization" class="form-label fw-semibold">Specialization</label>
+                <select asp-for="Specialization" class="form-select">
+                    <option value="">-- Select Specialization --</option>
+                    <option>General Medicine</option>
+                    <option>Pediatrics</option>
+                    <option>Cardiology</option>
+                    <option>Orthopedics</option>
+                    <option>Dermatology</option>
+                    <option>Dental</option>
+                    <option>ENT</option>
+                </select>
+                <span asp-validation-for="Specialization" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="LicenseNumber" class="form-label fw-semibold">License Number</label>
+                <input asp-for="LicenseNumber" class="form-control" placeholder="Enter license number" />
+                <span asp-validation-for="LicenseNumber" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label fw-semibold">Password</label>
+                <input asp-for="Password" type="password" class="form-control" placeholder="Enter temporary password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ConfirmPassword" class="form-label fw-semibold">Confirm Password</label>
+                <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Confirm password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success px-4">➕ Add Doctor</button>
+                <a asp-action="Users" class="btn btn-outline-secondary ms-2 px-4">← Back to Users</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

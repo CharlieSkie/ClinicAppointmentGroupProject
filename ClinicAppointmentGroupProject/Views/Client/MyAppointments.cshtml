@@ -1,0 +1,85 @@
+﻿@model List<ClinicAppointmentGroupProject.Models.Patient>
+@{
+    ViewData["Title"] = "My Appointments";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold">📋 My Appointments</h1>
+        <a asp-action="BookAppointment" class="btn btn-primary">📅 Book New Appointment</a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Appointment ID</th>
+                                <th>Patient Name</th>
+                                <th>Department</th>
+                                <th>Doctor</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Booked On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var appointment in Model)
+                            {
+                                <tr>
+                                    <td><span class="badge bg-secondary">@appointment.appointmentId</span></td>
+                                    <td>@appointment.patientName</td>
+                                    <td>@appointment.department</td>
+                                    <td>@(appointment.Doctor?.FullName ?? "Not Assigned")</td>
+                                    <td>@appointment.AppointmentDate.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        <span class="badge @GetStatusBadgeClass(appointment.Status)">
+                                            @appointment.Status
+                                        </span>
+                                    </td>
+                                    <td>@appointment.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        @if (appointment.Status == ClinicAppointmentGroupProject.Models.AppointmentStatus.Pending)
+                                        {
+                                            <button class="btn btn-outline-danger btn-sm">Cancel</button>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">No actions</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <p class="text-muted">You haven't booked any appointments yet.</p>
+                    <a asp-action="BookAppointment" class="btn btn-primary mt-2">Book Your First Appointment</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string GetStatusBadgeClass(ClinicAppointmentGroupProject.Models.AppointmentStatus status)
+    {
+        return status switch
+        {
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Pending => "bg-warning",
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Confirmed => "bg-success",
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Completed => "bg-info",
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Cancelled => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

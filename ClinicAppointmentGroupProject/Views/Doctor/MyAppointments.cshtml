@@ -1,0 +1,101 @@
+﻿@model List<ClinicAppointmentGroupProject.Models.Patient>
+@{
+    ViewData["Title"] = "My Appointments";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold">📋 My Appointments</h1>
+        <div class="btn-group">
+            <button class="btn btn-outline-primary">Today</button>
+            <button class="btn btn-outline-secondary">This Week</button>
+            <button class="btn btn-outline-info">All</button>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Appointment ID</th>
+                                <th>Patient Name</th>
+                                <th>Department</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Booked On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var appointment in Model)
+                            {
+                                <tr>
+                                    <td><span class="badge bg-secondary">@appointment.appointmentId</span></td>
+                                    <td>@appointment.patientName</td>
+                                    <td>@appointment.department</td>
+                                    <td>@appointment.AppointmentDate.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        <span class="badge @GetStatusBadgeClass(appointment.Status)">
+                                            @appointment.Status
+                                        </span>
+                                    </td>
+                                    <td>@appointment.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        <form method="post" asp-action="UpdateAppointmentStatus" class="d-inline">
+                                            <input type="hidden" name="appointmentId" value="@appointment.appointmentId" />
+                                            <div class="btn-group btn-group-sm">
+                                                @if (appointment.Status == ClinicAppointmentGroupProject.Models.AppointmentStatus.Pending)
+                                                {
+                                                    <button type="submit" name="status" value="Confirmed"
+                                                            class="btn btn-success">
+                                                        Confirm
+                                                    </button>
+                                                    <button type="submit" name="status" value="Cancelled"
+                                                            class="btn btn-danger">
+                                                        Cancel
+                                                    </button>
+                                                }
+                                                else if (appointment.Status == ClinicAppointmentGroupProject.Models.AppointmentStatus.Confirmed)
+                                                {
+                                                    <button type="submit" name="status" value="Completed"
+                                                            class="btn btn-info">
+                                                        Complete
+                                                    </button>
+                                                }
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <p class="text-muted">No appointments assigned to you.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string GetStatusBadgeClass(ClinicAppointmentGroupProject.Models.AppointmentStatus status)
+    {
+        return status switch
+        {
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Pending => "bg-warning",
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Confirmed => "bg-success",
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Completed => "bg-info",
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Cancelled => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

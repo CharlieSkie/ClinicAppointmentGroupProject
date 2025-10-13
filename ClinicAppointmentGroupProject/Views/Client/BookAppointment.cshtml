@@ -1,0 +1,114 @@
+﻿@model ClinicAppointmentGroupProject.Controllers.BookAppointmentViewModel
+@{
+    ViewData["Title"] = "Book Appointment";
+    Layout = "_Layout";
+}
+
+<div class="d-flex justify-content-center align-items-center mt-4">
+    <div class="card shadow-lg p-4 w-100" style="max-width: 600px;">
+        <h3 class="text-center mb-4 fw-bold">📅 Book New Appointment</h3>
+
+        <form asp-action="BookAppointment" method="post">
+            <div class="mb-3">
+                <label asp-for="PatientName" class="form-label fw-semibold">Patient Name</label>
+                <input asp-for="PatientName" class="form-control" placeholder="Enter patient name" />
+                <span asp-validation-for="PatientName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Department" class="form-label fw-semibold">Department</label>
+                <select asp-for="Department" class="form-select">
+                    <option value="">-- Select Department --</option>
+                    <option>General Medicine</option>
+                    <option>Pediatrics</option>
+                    <option>Dental</option>
+                    <option>ENT</option>
+                    <option>Cardiology</option>
+                    <option>Orthopedics</option>
+                    <option>Dermatology</option>
+                </select>
+                <span asp-validation-for="Department" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DoctorId" class="form-label fw-semibold">Select Doctor</label>
+                <select asp-for="DoctorId" class="form-select">
+                    <option value="">-- Select Doctor --</option>
+                    @foreach (var doctor in ViewBag.Doctors)
+                    {
+                        <option value="@doctor.Id">Dr. @doctor.FullName - @doctor.Specialization</option>
+                    }
+                </select>
+                <span asp-validation-for="DoctorId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AppointmentDate" class="form-label fw-semibold">Appointment Date</label>
+                <input asp-for="AppointmentDate" class="form-control" type="date"
+                       min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary px-4">💾 Book Appointment</button>
+                <a asp-action="Dashboard" class="btn btn-outline-secondary ms-2 px-4">← Back to Dashboard</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    /* ===== Responsive and Theme-Adaptive Form ===== */
+    body {
+        font-family: "Segoe UI", sans-serif;
+    }
+
+    .card {
+        border-radius: 15px;
+        transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+    }
+
+    /* ===== DARK THEME ===== */
+    [data-bs-theme="dark"] .card {
+        background-color: #222;
+        color: #f1f1f1;
+        border: 1px solid #333;
+    }
+
+    [data-bs-theme="dark"] input.form-control,
+    [data-bs-theme="dark"] select.form-select {
+        background-color: #333;
+        color: #f1f1f1;
+        border-color: #444;
+    }
+
+        [data-bs-theme="dark"] input.form-control::placeholder {
+            color: #aaa;
+        }
+
+    /* ===== LIGHT THEME ===== */
+    [data-bs-theme="light"] .card {
+        background-color: #fff;
+        color: #212529;
+        border: 1px solid #dee2e6;
+    }
+
+    [data-bs-theme="light"] input.form-control,
+    [data-bs-theme="light"] select.form-select {
+        background-color: #fff;
+        color: #212529;
+        border-color: #ccc;
+    }
+
+    /* ===== Mobile Friendly ===== */
+    @@media (max-width: 576px) {
+        .card {
+            margin: 1rem;
+            padding: 1.5rem !important;
+        }
+    }
+</style>

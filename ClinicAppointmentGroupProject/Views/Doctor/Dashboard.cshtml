@@ -1,0 +1,149 @@
+﻿@model ClinicAppointmentGroupProject.Controllers.DoctorDashboardViewModel
+@{
+    ViewData["Title"] = "Doctor Dashboard";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold">👨‍⚕️ Doctor Dashboard</h1>
+        <a asp-action="MyAppointments" class="btn btn-outline-primary">📋 View All Appointments</a>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card bg-primary text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="card-title">@Model.TotalAppointments</h3>
+                            <p class="card-text">Total Appointments</p>
+                        </div>
+                        <div class="align-self-center">
+                            <span class="fs-1">📈</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="card-title">@Model.TodayAppointments.Count</h3>
+                            <p class="card-text">Today's Appointments</p>
+                        </div>
+                        <div class="align-self-center">
+                            <span class="fs-1">📅</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Today's Appointments -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">🕐 Today's Appointments</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.TodayAppointments.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var appointment in Model.TodayAppointments)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">@appointment.patientName</h6>
+                                            <p class="mb-1 text-muted">@appointment.department</p>
+                                            <small>ID: @appointment.appointmentId</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge @GetStatusBadgeClass(appointment.Status) mb-2">
+                                                @appointment.Status
+                                            </span>
+                                            <br>
+                                            <form method="post" asp-action="UpdateAppointmentStatus" class="d-inline">
+                                                <input type="hidden" name="appointmentId" value="@appointment.appointmentId" />
+                                                <button type="submit" name="status" value="Confirmed"
+                                                        class="btn btn-success btn-sm">
+                                                    Confirm
+                                                </button>
+                                                <button type="submit" name="status" value="Completed"
+                                                        class="btn btn-info btn-sm">
+                                                    Complete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center">No appointments scheduled for today.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Appointments -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📅 Upcoming Appointments</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.UpcomingAppointments.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var appointment in Model.UpcomingAppointments)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">@appointment.patientName</h6>
+                                            <p class="mb-1 text-muted">@appointment.department</p>
+                                            <small class="text-muted">
+                                                @appointment.AppointmentDate.ToString("MMM dd, yyyy")
+                                            </small>
+                                        </div>
+                                        <span class="badge @GetStatusBadgeClass(appointment.Status)">
+                                            @appointment.Status
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center">No upcoming appointments.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string GetStatusBadgeClass(ClinicAppointmentGroupProject.Models.AppointmentStatus status)
+    {
+        return status switch
+        {
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Pending => "bg-warning",
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Confirmed => "bg-success",
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Completed => "bg-info",
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Cancelled => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

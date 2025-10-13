@@ -1,215 +1,220 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Clinic Appointment System</title>
-
+    <title>@ViewData["Title"] - Clinic System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ClinicAppointmentGroupProject.styles.css" asp-append-version="true" />
-
     <style>
-        /* ===== GENERAL LAYOUT ===== */
-        body {
-            display: flex;
-            margin: 0;
-            min-height: 100vh;
-            transition: background-color 0.4s ease, color 0.4s ease;
-        }
-
+        /* Simple Sidebar Styles */
         .sidebar {
             width: 250px;
             min-height: 100vh;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
             position: fixed;
             left: 0;
             top: 0;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
         }
 
-        .content {
+        .main-content {
             margin-left: 250px;
-            flex-grow: 1;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
+            padding: 20px;
             min-height: 100vh;
-            transition: all 0.3s ease;
+            background-color: #ffffff;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+            background-color: #007bff;
+            color: white;
+        }
+
+        .sidebar-nav {
+            padding: 15px 0;
+        }
+
+        .nav-item {
+            margin: 5px 15px;
         }
 
         .nav-link {
-            border-radius: 8px;
-            margin: 3px 12px;
-            transition: all 0.2s ease;
+            color: #495057;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s;
         }
 
             .nav-link:hover {
-                transform: translateX(5px);
+                background-color: #e9ecef;
+                color: #007bff;
             }
 
             .nav-link.active {
-                font-weight: bold;
-                background-color: rgba(13, 110, 253, 0.15);
+                background-color: #007bff;
+                color: white;
             }
 
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: inherit;
-            font-size: 1.3rem;
-            cursor: pointer;
-        }
-
-        footer {
-            text-align: center;
-            padding: 1rem;
-            margin-top: auto;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            transition: background-color 0.4s ease, color 0.4s ease;
-        }
-
-        /* ===== DARK THEME ===== */
-        [data-bs-theme="dark"] .sidebar {
-            background-color: #121212;
-            color: #f8f9fa;
-        }
-
-        [data-bs-theme="dark"] .sidebar a {
-            color: #ddd;
-        }
-
-        [data-bs-theme="dark"] .sidebar a:hover {
-            background-color: #1e1e1e;
-            color: #66b2ff;
-        }
-
-        [data-bs-theme="dark"] .content {
-            background-color: #181818;
-            color: #f1f1f1;
-        }
-
-        [data-bs-theme="dark"] footer {
-            background-color: #121212;
-            color: #aaa;
-        }
-
-        /* ===== LIGHT THEME ===== */
-        [data-bs-theme="light"] .sidebar {
-            background-color: #ffffff;
-            color: #212529;
-            border-right: 1px solid #dee2e6;
-        }
-
-        [data-bs-theme="light"] .sidebar a {
-            color: #212529;
-        }
-
-        [data-bs-theme="light"] .sidebar a:hover {
+        .user-info {
+            padding: 15px;
+            border-top: 1px solid #dee2e6;
             background-color: #e9ecef;
-            color: #0d6efd;
         }
 
-        [data-bs-theme="light"] .content {
-            background-color: #f8f9fa;
-            color: #212529;
+        .role-badge {
+            font-size: 0.7em;
+            margin-left: 5px;
         }
 
-        [data-bs-theme="light"] footer {
-            background-color: #ffffff;
-            color: #6c757d;
-        }
+        /* Mobile Responsive */
+        @@media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
 
-        /* ===== RESPONSIVE ===== */
-        @@media (max-width: 992px) {
-            .sidebar
-
-        {
-            left: -250px;
-        }
-
-        .sidebar.active {
-            left: 0;
-        }
-
-        .content {
-            margin-left: 0;
-        }
-
-        #menuToggle {
-            display: inline-block;
-            position: fixed;
-            top: 12px;
-            left: 12px;
-            z-index: 1100;
-            font-size: 1.6rem;
-            cursor: pointer;
-        }
-
+            .main-content {
+                margin-left: 0;
+            }
         }
     </style>
 </head>
-
-<body class="d-flex">
+<body>
     <!-- Sidebar -->
     <div class="sidebar">
-        <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
-            <h4 class="fw-bold mb-0">🏥 Clinic</h4>
-            <button id="themeToggle" class="theme-toggle" title="Toggle Theme">🌙</button>
+        <!-- Sidebar Header -->
+        <div class="sidebar-header">
+            <h5>🏥 Clinic System</h5>
         </div>
 
-        <nav class="nav flex-column mt-3">
-            <a class="nav-link px-4 py-2" asp-controller="Home" asp-action="Index">🏠 Home</a>
-            <a class="nav-link px-4 py-2" asp-controller="Home" asp-action="About">ℹ️ About</a>
-            <a class="nav-link px-4 py-2" asp-controller="Home" asp-action="Create">➕ Create Appointment</a>
-            <a class="nav-link px-4 py-2" asp-controller="Home" asp-action="Result">📋 Appointment List</a>
+        <!-- User Info -->
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <div class="user-info">
+                <small>Welcome,</small>
+                <div class="d-flex align-items-center">
+                    <strong>@User.Identity?.Name "User"</strong>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <span class="badge bg-danger role-badge">ADMIN</span>
+                    }
+                    else if (User.IsInRole("Doctor"))
+                    {
+                        <span class="badge bg-primary role-badge">DOCTOR</span>
+                    }
+                    else if (User.IsInRole("Client"))
+                    {
+                        <span class="badge bg-success role-badge">CLIENT</span>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+            <!-- Common Links -->
+            <div class="nav-item">
+                <a class="nav-link" asp-controller="Home" asp-action="Index">🏠 Home</a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" asp-controller="Home" asp-action="About">ℹ️ About</a>
+            </div>
+
+            <!-- Role-Based Navigation -->
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <!-- Admin Links -->
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="Dashboard">📊 Admin Dashboard</a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="Users">👥 Manage Users</a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="Appointments">📋 All Appointments</a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="CreateDoctor">➕ Add Doctor</a>
+                    </div>
+                }
+
+                <!-- Doctor Links -->
+                @if (User.IsInRole("Doctor"))
+                {
+                    <div class="nav-item">
+                        <a class="nav-link" asp-controller="Doctor" asp-action="Dashboard">👨‍⚕️ Doctor Dashboard</a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" asp-controller="Doctor" asp-action="MyAppointments">📅 My Appointments</a>
+                    </div>
+                }
+
+                <!-- Client Links -->
+                @if (User.IsInRole("Client"))
+                {
+                    <div class="nav-item">
+                        <a class="nav-link" asp-controller="Client" asp-action="Dashboard">👤 Client Dashboard</a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" asp-controller="Client" asp-action="BookAppointment">➕ Book Appointment</a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" asp-controller="Client" asp-action="MyAppointments">📋 My Appointments</a>
+                    </div>
+                }
+
+                <!-- Authentication Links -->
+                <div class="nav-item">
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="nav-link text-start border-0 bg-transparent w-100">
+                            🚪 Logout
+                        </button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <!-- Unauthenticated Links -->
+                <div class="nav-item">
+                    <a class="nav-link" asp-controller="Account" asp-action="Login">🔐 Login</a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" asp-controller="Account" asp-action="Register">👤 Register</a>
+                </div>
+            }
         </nav>
     </div>
 
-    <!-- Menu Toggle for Mobile -->
-    <div id="menuToggle" class="text-light d-lg-none">☰</div>
-
-    <!-- Content -->
-    <div class="content">
-        <main role="main" class="flex-grow-1 pb-3">
-            @RenderBody()
-        </main>
-
-        <footer class="small">
-            &copy; @DateTime.Now.Year - Clinic Appointment Management System
-        </footer>
+    <!-- Main Content -->
+    <div class="main-content">
+        @RenderBody()
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // Sidebar toggle for small screens
-        const menuToggle = document.getElementById("menuToggle");
-        const sidebar = document.querySelector(".sidebar");
-        menuToggle?.addEventListener("click", () => {
-            sidebar.classList.toggle("active");
+        // Simple active link highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                if (linkPath && currentPath.includes(linkPath)) {
+                    link.classList.add('active');
+                }
+            });
         });
-
-        // Theme toggle logic
-        const themeToggle = document.getElementById("themeToggle");
-        const html = document.documentElement;
-        const savedTheme = localStorage.getItem("theme") || "dark";
-        html.setAttribute("data-bs-theme", savedTheme);
-        updateIcon();
-
-        themeToggle.addEventListener("click", () => {
-            const currentTheme = html.getAttribute("data-bs-theme");
-            const newTheme = currentTheme === "dark" ? "light" : "dark";
-            html.setAttribute("data-bs-theme", newTheme);
-            localStorage.setItem("theme", newTheme);
-            updateIcon();
-        });
-
-        function updateIcon() {
-            const currentTheme = html.getAttribute("data-bs-theme");
-            themeToggle.textContent = currentTheme === "dark" ? "☀️" : "🌙";
-        }
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

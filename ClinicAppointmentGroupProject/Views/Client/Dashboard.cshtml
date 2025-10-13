@@ -1,0 +1,128 @@
+﻿@model ClinicAppointmentGroupProject.Controllers.ClientDashboardViewModel
+@{
+    ViewData["Title"] = "Client Dashboard";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold">👤 Client Dashboard</h1>
+        <a asp-action="BookAppointment" class="btn btn-primary">➕ Book New Appointment</a>
+    </div>
+
+    <div class="row">
+        <!-- Upcoming Appointments -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">📅 Upcoming Appointments</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.UpcomingAppointments.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var appointment in Model.UpcomingAppointments)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">@appointment.patientName</h6>
+                                            <p class="mb-1 text-muted">@appointment.department</p>
+                                            <small class="text-muted">
+                                                Doctor: @(appointment.Doctor?.FullName ?? "Not assigned")
+                                            </small>
+                                            <br>
+                                            <small class="text-muted">
+                                                Date: @appointment.AppointmentDate.ToString("MMM dd, yyyy")
+                                            </small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge @GetStatusBadgeClass(appointment.Status) mb-2">
+                                                @appointment.Status
+                                            </span>
+                                            <br>
+                                            <small class="text-muted">ID: @appointment.appointmentId</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <p class="text-muted">No upcoming appointments.</p>
+                            <a asp-action="BookAppointment" class="btn btn-outline-primary">Book Your First Appointment</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Appointments -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">📋 Recent Appointments</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentAppointments.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var appointment in Model.RecentAppointments)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">@appointment.patientName</h6>
+                                            <p class="mb-1 text-muted">@appointment.department</p>
+                                            <small class="text-muted">
+                                                @appointment.AppointmentDate.ToString("MMM dd, yyyy")
+                                            </small>
+                                        </div>
+                                        <span class="badge @GetStatusBadgeClass(appointment.Status)">
+                                            @appointment.Status
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center">No recent appointments.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-3">Quick Actions</h5>
+                    <div class="btn-group">
+                        <a asp-action="BookAppointment" class="btn btn-success">📅 Book Appointment</a>
+                        <a asp-action="MyAppointments" class="btn btn-outline-primary">📋 View All Appointments</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string GetStatusBadgeClass(ClinicAppointmentGroupProject.Models.AppointmentStatus status)
+    {
+        return status switch
+        {
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Pending => "bg-warning",
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Confirmed => "bg-success",
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Completed => "bg-info",
+            ClinicAppointmentGroupProject.Models.AppointmentStatus.Cancelled => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

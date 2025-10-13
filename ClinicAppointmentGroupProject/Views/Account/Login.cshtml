@@ -1,0 +1,63 @@
+﻿@model ClinicAppointmentGroupProject.Controllers.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_Layout";
+}
+
+<div class="d-flex justify-content-center align-items-center min-vh-80">
+    <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px;">
+        <div class="card-body p-4">
+            <h2 class="card-title text-center mb-4">🔐 Login</h2>
+
+            <form asp-action="Login" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">Email Address</label>
+                    <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">Password</label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label">Remember me</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 mb-3">Login</button>
+
+                <div class="text-center">
+                    <p class="mb-0">
+                        Don't have an account?
+                        <a asp-action="Register" class="text-decoration-none">Register here</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .min-vh-80 {
+        min-height: 80vh;
+    }
+
+    [data-bs-theme="dark"] .card {
+        background-color: #1e1e1e;
+        color: #f1f1f1;
+    }
+
+    [data-bs-theme="light"] .card {
+        background-color: #ffffff;
+        color: #212529;
+    }
+</style>
