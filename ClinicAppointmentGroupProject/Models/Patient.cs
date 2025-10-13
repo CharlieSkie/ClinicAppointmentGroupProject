@@ -14,6 +14,7 @@ namespace ClinicAppointmentGroupProject.Models
         public string department { get; set; } = string.Empty;
 
         public DateTime AppointmentDate { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public string? DoctorId { get; set; }

@@ -13,6 +13,7 @@ namespace ClinicAppointmentGroupProject.Models
         public UserType UserType { get; set; }
 
         public string? Specialization { get; set; }
+
         public string? LicenseNumber { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
