@@ -16,12 +16,25 @@ namespace ClinicAppointmentGroupProject.Models
         {
             base.OnModelCreating(builder);
 
+            // 🚀 NEW: Ignore unwanted columns on the ApplicationUser (AspNetUsers) table
+            builder.Entity<ApplicationUser>(entity =>
+            {
+                entity.Ignore(e => e.PhoneNumber);
+                entity.Ignore(e => e.PhoneNumberConfirmed);
+                entity.Ignore(e => e.TwoFactorEnabled);
+                entity.Ignore(e => e.LockoutEnabled);
+                entity.Ignore(e => e.AccessFailedCount);
+            });
+            // End NEW
+
+            // Patient -> Doctor (Foreign Key Configuration)
             builder.Entity<Patient>()
                 .HasOne(p => p.Doctor)
                 .WithMany()
                 .HasForeignKey(p => p.DoctorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Patient -> ClientUser (Foreign Key Configuration)
             builder.Entity<Patient>()
                 .HasOne(p => p.ClientUser)
                 .WithMany()

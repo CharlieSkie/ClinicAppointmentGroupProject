@@ -2,20 +2,20 @@
 using ClinicAppointmentGroupProject.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure; // This using directive is often needed
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure; // Needed for MySQL
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllersWithViews();
 
-// 🚀 UPDATED: MySQL connection setup
+// 🚀 UPDATED: MySQL connection setup (using Pomelo.EntityFrameworkCore.MySql)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ClinicDbContext>(options =>
     options.UseMySql(
         connectionString,
-        ServerVersion.AutoDetect(connectionString)
+        ServerVersion.AutoDetect(connectionString) // Automatically determines MySQL version
     )
 );
 // End UPDATED section

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClinicAppointmentGroupProject.Migrations
 {
     [DbContext(typeof(ClinicDbContext))]
-    [Migration("20251014231948_InitilaCreate")]
-    partial class InitilaCreate
+    [Migration("20251014234905_initialCraete")]
+    partial class initialCraete
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,9 +29,6 @@ namespace ClinicAppointmentGroupProject.Migrations
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -55,9 +52,6 @@ namespace ClinicAppointmentGroupProject.Migrations
                     b.Property<string>("LicenseNumber")
                         .HasColumnType("longtext");
 
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetime(6)");
 
@@ -72,20 +66,11 @@ namespace ClinicAppointmentGroupProject.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Specialization")
                         .HasColumnType("longtext");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
