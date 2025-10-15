@@ -2,25 +2,25 @@
 using ClinicAppointmentGroupProject.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure; // Needed for MySQL
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore; // Still needed for Identity Store types
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllersWithViews();
 
-// 🚀 UPDATED: MySQL connection setup (using Pomelo.EntityFrameworkCore.MySql)
+// MySQL connection setup
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ClinicDbContext>(options =>
     options.UseMySql(
         connectionString,
-        ServerVersion.AutoDetect(connectionString) // Automatically determines MySQL version
+        ServerVersion.AutoDetect(connectionString)
     )
 );
-// End UPDATED section
 
-// Identity Configuration
+// CRITICAL FIX: Identity Configuration now uses the Custom Stores
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -31,7 +31,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
     options.User.RequireUniqueEmail = true;
 })
-.AddEntityFrameworkStores<ClinicDbContext>()
+// 🛑 CHANGE: Use CustomUserStore and CustomRoleStore
+.AddUserStore<CustomUserStore>()
+.AddRoleStore<CustomRoleStore>()
 .AddDefaultTokenProviders();
 
 builder.Services.ConfigureApplicationCookie(options =>
@@ -40,6 +42,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
+// 🛑 MISSING LINE: This line defines the 'app' variable.
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -60,6 +63,7 @@ app.UseAuthorization();
 // Seed roles and admin user
 using (var scope = app.Services.CreateScope())
 {
+    // Ensure SeedData.Initialize is available
     await SeedData.Initialize(scope.ServiceProvider);
 }
 
