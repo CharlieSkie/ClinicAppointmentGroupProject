@@ -167,7 +167,7 @@ namespace ClinicAppointmentGroupProject.Controllers
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = $"User {user.FullName} has been rejected.";
+                TempData["SuccessMessage"] = $"User {user.FullName} has been rejected and removed from the list.";
             }
             else
             {
