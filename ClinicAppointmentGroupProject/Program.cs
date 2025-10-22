@@ -3,7 +3,6 @@ using ClinicAppointmentGroupProject.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore; // Still needed for Identity Store types
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +19,7 @@ builder.Services.AddDbContext<ClinicDbContext>(options =>
     )
 );
 
-// CRITICAL FIX: Identity Configuration now uses the Custom Stores
+// Identity Configuration
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -28,10 +27,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 6;
     options.Password.RequireNonAlphanumeric = false;
-
     options.User.RequireUniqueEmail = true;
 })
-// 🛑 CHANGE: Use CustomUserStore and CustomRoleStore
 .AddUserStore<CustomUserStore>()
 .AddRoleStore<CustomRoleStore>()
 .AddDefaultTokenProviders();
@@ -42,7 +39,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
-// 🛑 MISSING LINE: This line defines the 'app' variable.
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -60,11 +56,21 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Seed roles and admin user
-using (var scope = app.Services.CreateScope())
+// Seed roles and admin user - WITH PROPER ERROR HANDLING
+try
 {
-    // Ensure SeedData.Initialize is available
-    await SeedData.Initialize(scope.ServiceProvider);
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        Console.WriteLine("Starting seed data...");
+        await SeedData.Initialize(services);
+        Console.WriteLine("Seed data completed successfully.");
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"SEED DATA ERROR: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
 }
 
 app.MapControllerRoute(

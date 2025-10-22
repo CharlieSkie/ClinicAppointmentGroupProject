@@ -7,7 +7,19 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="fw-bold">👥 User Management</h1>
-        <a asp-action="CreateDoctor" class="btn btn-primary">➕ Add Doctor</a>
+        <div class="btn-group">
+            <a asp-action="CreateDoctor" class="btn btn-primary">➕ Add Doctor</a>
+            <a asp-action="PendingApprovals" class="btn btn-warning">
+                ⏳ Pending Approvals
+                @{
+                    var pendingCount = Model.Count(ur => ur.User.ApprovalStatus == ClinicAppointmentGroupProject.Models.ApprovalStatus.Pending);
+                    if (pendingCount > 0)
+                    {
+                        <span class="badge bg-danger ms-1">@pendingCount</span>
+                    }
+                }
+            </a>
+        </div>
     </div>
 
     <div class="card shadow">
@@ -26,7 +38,8 @@
                                 <th>Role</th>
                                 <th>Type</th>
                                 <th>Specialization</th>
-                                <th>Status</th>
+                                <th>Approval Status</th>
+                                <th>Registered</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -51,15 +64,34 @@
                                     <td>@userRole.User.UserType</td>
                                     <td>@userRole.User.Specialization</td>
                                     <td>
-                                        <span class="badge bg-success">Active</span>
+                                        <span class="badge @GetApprovalStatusBadgeClass(userRole.User.ApprovalStatus)">
+                                            @userRole.User.ApprovalStatus
+                                        </span>
+                                        @if (userRole.User.ApprovalStatus == ClinicAppointmentGroupProject.Models.ApprovalStatus.Approved && userRole.User.ApprovedAt.HasValue)
+                                        {
+                                            <br />
+                                            <small class="text-muted">Approved: @userRole.User.ApprovedAt.Value.ToString("MMM dd, yyyy")</small>
+                                        }
                                     </td>
+                                    <td>@userRole.User.CreatedAt.ToString("MMM dd, yyyy")</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            @if (userRole.Roles.Contains("Doctor"))
+                                            @if (userRole.User.ApprovalStatus == ClinicAppointmentGroupProject.Models.ApprovalStatus.Pending)
                                             {
-                                                <button class="btn btn-outline-info">View Schedule</button>
+                                                <form method="post" asp-action="ApproveUser" class="d-inline">
+                                                    <input type="hidden" name="userId" value="@userRole.User.Id" />
+                                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                                </form>
+                                                <form method="post" asp-action="RejectUser" class="d-inline">
+                                                    <input type="hidden" name="userId" value="@userRole.User.Id" />
+                                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                                </form>
                                             }
-                                            <button class="btn btn-outline-warning">Reset Password</button>
+                                            else if (userRole.Roles.Contains("Doctor"))
+                                            {
+                                                <button class="btn btn-outline-info btn-sm">View Schedule</button>
+                                            }
+                                            <button class="btn btn-outline-warning btn-sm">Reset Password</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -86,6 +118,17 @@
             "Admin" => "bg-danger",
             "Doctor" => "bg-primary",
             "Client" => "bg-success",
+            _ => "bg-secondary"
+        };
+    }
+
+    public string GetApprovalStatusBadgeClass(ClinicAppointmentGroupProject.Models.ApprovalStatus status)
+    {
+        return status switch
+        {
+            ClinicAppointmentGroupProject.Models.ApprovalStatus.Pending => "bg-warning",
+            ClinicAppointmentGroupProject.Models.ApprovalStatus.Approved => "bg-success",
+            ClinicAppointmentGroupProject.Models.ApprovalStatus.Rejected => "bg-danger",
             _ => "bg-secondary"
         };
     }

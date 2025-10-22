@@ -33,11 +33,26 @@ namespace ClinicAppointmentGroupProject.Controllers
 
             if (ModelState.IsValid)
             {
+                // Check if user exists and their approval status
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user != null)
+                {
+                    if (user.ApprovalStatus == ApprovalStatus.Pending)
+                    {
+                        ModelState.AddModelError(string.Empty, "Your account is pending admin approval. Please wait for approval before logging in.");
+                        return View(model);
+                    }
+                    else if (user.ApprovalStatus == ApprovalStatus.Rejected)
+                    {
+                        ModelState.AddModelError(string.Empty, "Your account registration has been rejected. Please contact administrator.");
+                        return View(model);
+                    }
+                }
+
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
 
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByEmailAsync(model.Email);
                     if (user != null)
                     {
                         if (await _userManager.IsInRoleAsync(user, "Admin"))
@@ -75,21 +90,36 @@ namespace ClinicAppointmentGroupProject.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Map SelectedRole to UserType
+                var userType = model.SelectedRole switch
+                {
+                    "Admin" => UserType.Admin,
+                    "Doctor" => UserType.Doctor,
+                    "Client" => UserType.Client,
+                    _ => UserType.Client
+                };
+
                 var user = new ApplicationUser
                 {
                     UserName = model.Email,
                     Email = model.Email,
                     FullName = model.FullName,
-                    UserType = UserType.Client
+                    UserType = userType,
+                    Specialization = model.Specialization,
+                    LicenseNumber = model.LicenseNumber,
+                    ApprovalStatus = ApprovalStatus.Pending // New users need approval
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "Client");
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Dashboard", "Client");
+                    // Assign to role based on selection
+                    await _userManager.AddToRoleAsync(user, model.SelectedRole);
+
+                    // Don't sign in automatically - wait for admin approval
+                    TempData["SuccessMessage"] = "Registration successful! Please wait for admin approval before logging in.";
+                    return RedirectToAction("Login");
                 }
 
                 foreach (var error in result.Errors)
@@ -139,6 +169,17 @@ namespace ClinicAppointmentGroupProject.Controllers
         [Required]
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please select a role")]
+        [Display(Name = "Register As")]
+        public string SelectedRole { get; set; } = string.Empty;
+
+        // Doctor-specific fields (optional for other roles)
+        [Display(Name = "Specialization")]
+        public string? Specialization { get; set; }
+
+        [Display(Name = "License Number")]
+        public string? LicenseNumber { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]

@@ -214,7 +214,7 @@
             <div class="user-info">
                 <small>Welcome,</small>
                 <div class="d-flex align-items-center">
-                    <strong>@User.Identity?.Name "User"</strong>
+                    <strong>@User.Identity?.Name</strong>
                     @if (User.IsInRole("Admin"))
                     {
                         <span class="badge role-badge admin-badge">ADMIN</span>
@@ -249,6 +249,9 @@
                 {
                     <div class="nav-item">
                         <a class="nav-link" asp-controller="Admin" asp-action="Dashboard">📊 Admin Dashboard</a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="PendingApprovals">⏳ Pending Approvals</a>
                     </div>
                     <div class="nav-item">
                         <a class="nav-link" asp-controller="Admin" asp-action="Users">👥 Manage Users</a>

@@ -31,7 +31,8 @@ namespace ClinicAppointmentGroupProject.Controllers
                     .Include(p => p.ClientUser)
                     .OrderByDescending(p => p.CreatedAt)
                     .Take(10)
-                    .ToListAsync()
+                    .ToListAsync(),
+                PendingApprovalsCount = await _userManager.Users.CountAsync(u => u.ApprovalStatus == ApprovalStatus.Pending)
             };
 
             return View(model);
@@ -74,7 +75,8 @@ namespace ClinicAppointmentGroupProject.Controllers
                     FullName = model.FullName,
                     UserType = UserType.Doctor,
                     Specialization = model.Specialization,
-                    LicenseNumber = model.LicenseNumber
+                    LicenseNumber = model.LicenseNumber,
+                    ApprovalStatus = ApprovalStatus.Approved // Auto-approve admin-created doctors
                 };
 
                 var result = await _userManager.CreateAsync(doctor, model.Password);
@@ -104,6 +106,76 @@ namespace ClinicAppointmentGroupProject.Controllers
 
             return View(appointments);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> PendingApprovals()
+        {
+            var pendingUsers = await _userManager.Users
+                .Where(u => u.ApprovalStatus == ApprovalStatus.Pending)
+                .OrderBy(u => u.CreatedAt)
+                .ToListAsync();
+
+            var userRoles = new List<UserRoleViewModel>();
+            foreach (var user in pendingUsers)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                userRoles.Add(new UserRoleViewModel
+                {
+                    User = user,
+                    Roles = roles
+                });
+            }
+
+            return View(userRoles);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveUser(string userId, string? adminNotes = null)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                user.ApprovalStatus = ApprovalStatus.Approved;
+                user.ApprovedAt = DateTime.Now;
+                user.ApprovedBy = User.Identity?.Name;
+                user.AdminNotes = adminNotes;
+
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"User {user.FullName} has been approved successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "User not found.";
+            }
+
+            return RedirectToAction(nameof(PendingApprovals));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectUser(string userId, string? adminNotes = null)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                user.ApprovalStatus = ApprovalStatus.Rejected;
+                user.AdminNotes = adminNotes;
+
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"User {user.FullName} has been rejected.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "User not found.";
+            }
+
+            return RedirectToAction(nameof(PendingApprovals));
+        }
     }
 
     public class AdminDashboardViewModel
@@ -112,6 +184,7 @@ namespace ClinicAppointmentGroupProject.Controllers
         public IList<ApplicationUser> TotalDoctors { get; set; } = new List<ApplicationUser>();
         public IList<ApplicationUser> TotalClients { get; set; } = new List<ApplicationUser>();
         public IList<Patient> RecentAppointments { get; set; } = new List<Patient>();
+        public int PendingApprovalsCount { get; set; }
     }
 
     public class UserRoleViewModel
