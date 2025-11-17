@@ -40,7 +40,11 @@ namespace ClinicAppointmentGroupProject.Controllers
 
         public async Task<IActionResult> Users()
         {
-            var users = await _userManager.Users.ToListAsync();
+            // Filter out rejected users and get only approved and pending users
+            var users = await _userManager.Users
+                .Where(u => u.ApprovalStatus != ApprovalStatus.Rejected)
+                .ToListAsync();
+
             var userRoles = new List<UserRoleViewModel>();
 
             foreach (var user in users)
@@ -68,6 +72,24 @@ namespace ClinicAppointmentGroupProject.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Generate auto-increment license number
+                var lastDoctor = await _userManager.Users
+                    .Where(u => u.UserType == UserType.Doctor && u.LicenseNumber != null)
+                    .OrderByDescending(u => u.LicenseNumber)
+                    .FirstOrDefaultAsync();
+
+                int nextNumber = 1;
+                if (lastDoctor != null && lastDoctor.LicenseNumber != null)
+                {
+                    var parts = lastDoctor.LicenseNumber.Split('-');
+                    if (parts.Length == 2 && int.TryParse(parts[1], out int lastNumber))
+                    {
+                        nextNumber = lastNumber + 1;
+                    }
+                }
+
+                var licenseNumber = $"doc-{nextNumber:D2}";
+
                 var doctor = new ApplicationUser
                 {
                     UserName = model.Email,
@@ -75,7 +97,7 @@ namespace ClinicAppointmentGroupProject.Controllers
                     FullName = model.FullName,
                     UserType = UserType.Doctor,
                     Specialization = model.Specialization,
-                    LicenseNumber = model.LicenseNumber,
+                    LicenseNumber = licenseNumber, // Use auto-generated number
                     ApprovalStatus = ApprovalStatus.Approved // Auto-approve admin-created doctors
                 };
 
@@ -84,6 +106,7 @@ namespace ClinicAppointmentGroupProject.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(doctor, "Doctor");
+                    TempData["SuccessMessage"] = $"Doctor created successfully with License Number: {licenseNumber}";
                     return RedirectToAction(nameof(Users));
                 }
 
@@ -161,13 +184,30 @@ namespace ClinicAppointmentGroupProject.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
-                user.ApprovalStatus = ApprovalStatus.Rejected;
-                user.AdminNotes = adminNotes;
+                // For pending approvals, we can safely delete since they shouldn't have appointments yet
+                var hasAppointments = await _context.Patients.AnyAsync(p => p.DoctorId == userId || p.ClientUserId == userId);
 
-                _context.Users.Update(user);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = $"User {user.FullName} has been rejected and removed from the list.";
+                if (hasAppointments)
+                {
+                    // If somehow they have appointments, mark as rejected instead
+                    user.ApprovalStatus = ApprovalStatus.Rejected;
+                    user.AdminNotes = adminNotes;
+                    await _userManager.UpdateAsync(user);
+                    TempData["SuccessMessage"] = $"User {user.FullName} has been rejected.";
+                }
+                else
+                {
+                    // Safe to delete - no appointments exist
+                    var result = await _userManager.DeleteAsync(user);
+                    if (result.Succeeded)
+                    {
+                        TempData["SuccessMessage"] = $"User {user.FullName} has been rejected and removed from the system.";
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = $"Failed to remove user: {string.Join(", ", result.Errors.Select(e => e.Description))}";
+                    }
+                }
             }
             else
             {
@@ -176,7 +216,67 @@ namespace ClinicAppointmentGroupProject.Controllers
 
             return RedirectToAction(nameof(PendingApprovals));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveUser(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                // Prevent admin from removing themselves
+                if (user.UserName == User.Identity?.Name)
+                {
+                    TempData["ErrorMessage"] = "You cannot remove your own account.";
+                    return RedirectToAction(nameof(Users));
+                }
+
+                // Check if user has related appointments
+                var hasAppointmentsAsDoctor = await _context.Patients.AnyAsync(p => p.DoctorId == userId);
+                var hasAppointmentsAsClient = await _context.Patients.AnyAsync(p => p.ClientUserId == userId);
+
+                if (hasAppointmentsAsDoctor || hasAppointmentsAsClient)
+                {
+                    // Instead of deleting, mark the user as rejected and disable them
+                    user.ApprovalStatus = ApprovalStatus.Rejected;
+                    user.EmailConfirmed = false;
+                    user.LockoutEnabled = true;
+                    user.LockoutEnd = DateTimeOffset.MaxValue; // Permanent lockout
+
+                    var updateResult = await _userManager.UpdateAsync(user);
+                    if (updateResult.Succeeded)
+                    {
+                        TempData["SuccessMessage"] = $"User {user.FullName} has been disabled and marked as rejected (user has related appointments).";
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = $"Failed to disable user: {string.Join(", ", updateResult.Errors.Select(e => e.Description))}";
+                    }
+                }
+                else
+                {
+                    // User has no appointments, safe to delete
+                    var result = await _userManager.DeleteAsync(user);
+                    if (result.Succeeded)
+                    {
+                        TempData["SuccessMessage"] = $"User {user.FullName} has been removed successfully.";
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = $"Failed to remove user: {string.Join(", ", result.Errors.Select(e => e.Description))}";
+                    }
+                }
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "User not found.";
+            }
+
+            return RedirectToAction(nameof(Users));
+        }
     }
+
+    // VIEW MODEL CLASSES - THESE WERE MISSING!
 
     public class AdminDashboardViewModel
     {
@@ -205,10 +305,6 @@ namespace ClinicAppointmentGroupProject.Controllers
 
         [Required]
         public string Specialization { get; set; } = string.Empty;
-
-        [Required]
-        [Display(Name = "License Number")]
-        public string LicenseNumber { get; set; } = string.Empty;
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]

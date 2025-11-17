@@ -85,6 +85,7 @@ namespace ClinicAppointmentGroupProject.Controllers
                 _context.Patients.Add(appointment);
                 await _context.SaveChangesAsync();
 
+                TempData["SuccessMessage"] = "Appointment booked successfully!";
                 return RedirectToAction(nameof(MyAppointments));
             }
 
@@ -110,6 +111,46 @@ namespace ClinicAppointmentGroupProject.Controllers
                 .ToListAsync();
 
             return View(appointments);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelAppointment(string appointmentId)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var appointment = await _context.Patients
+                .FirstOrDefaultAsync(p => p.appointmentId == appointmentId && p.ClientUserId == currentUser.Id);
+
+            if (appointment != null)
+            {
+                _context.Patients.Remove(appointment);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Appointment cancelled successfully!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Appointment not found or you don't have permission to cancel it.";
+            }
+
+            return RedirectToAction(nameof(MyAppointments));
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetDoctorsByDepartment(string department)
+        {
+            var doctors = await _userManager.GetUsersInRoleAsync("Doctor");
+            var filteredDoctors = doctors
+                .Where(d => d.Specialization?.ToLower() == department?.ToLower())
+                .Select(d => new { id = d.Id, name = $"Dr. {d.FullName} - {d.Specialization}" })
+                .ToList();
+
+            return Json(filteredDoctors);
         }
 
         private string GenerateNextId()

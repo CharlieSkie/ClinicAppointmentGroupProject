@@ -8,6 +8,14 @@
     <div class="card shadow-lg p-4 w-100" style="max-width: 600px;">
         <h3 class="text-center mb-4 fw-bold">📅 Book New Appointment</h3>
 
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
         <form asp-action="BookAppointment" method="post">
             <div class="mb-3">
                 <label asp-for="PatientName" class="form-label fw-semibold">Patient Name</label>
@@ -17,7 +25,7 @@
 
             <div class="mb-3">
                 <label asp-for="Department" class="form-label fw-semibold">Department</label>
-                <select asp-for="Department" class="form-select">
+                <select asp-for="Department" class="form-select" id="departmentSelect">
                     <option value="">-- Select Department --</option>
                     <option>General Medicine</option>
                     <option>Pediatrics</option>
@@ -32,11 +40,11 @@
 
             <div class="mb-3">
                 <label asp-for="DoctorId" class="form-label fw-semibold">Select Doctor</label>
-                <select asp-for="DoctorId" class="form-select">
+                <select asp-for="DoctorId" class="form-select" id="doctorSelect">
                     <option value="">-- Select Doctor --</option>
                     @foreach (var doctor in ViewBag.Doctors)
                     {
-                        <option value="@doctor.Id">Dr. @doctor.FullName - @doctor.Specialization</option>
+                        <option value="@doctor.Id" data-specialization="@doctor.Specialization">Dr. @doctor.FullName - @doctor.Specialization</option>
                     }
                 </select>
                 <span asp-validation-for="DoctorId" class="text-danger"></span>
@@ -59,6 +67,51 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const departmentSelect = document.getElementById('departmentSelect');
+            const doctorSelect = document.getElementById('doctorSelect');
+            const allDoctors = Array.from(doctorSelect.options).slice(1); // Exclude first option
+
+            departmentSelect.addEventListener('change', function() {
+                const selectedDepartment = this.value;
+
+                // Clear current options except the first one
+                while (doctorSelect.options.length > 1) {
+                    doctorSelect.remove(1);
+                }
+
+                if (selectedDepartment) {
+                    // Filter doctors by selected department
+                    const filteredDoctors = allDoctors.filter(doctor =>
+                        doctor.getAttribute('data-specialization') === selectedDepartment
+                    );
+
+                    // Add filtered doctors back to select
+                    filteredDoctors.forEach(doctor => {
+                        doctorSelect.appendChild(doctor);
+                    });
+
+                    if (filteredDoctors.length === 0) {
+                        const noDoctorOption = document.createElement('option');
+                        noDoctorOption.value = '';
+                        noDoctorOption.textContent = '-- No doctors available for this department --';
+                        doctorSelect.appendChild(noDoctorOption);
+                    }
+                } else {
+                    // Show all doctors when no department selected
+                    allDoctors.forEach(doctor => {
+                        doctorSelect.appendChild(doctor);
+                    });
+                }
+            });
+
+            // Trigger change on page load if there's a selected department
+            if (departmentSelect.value) {
+                departmentSelect.dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
 }
 
 <style>

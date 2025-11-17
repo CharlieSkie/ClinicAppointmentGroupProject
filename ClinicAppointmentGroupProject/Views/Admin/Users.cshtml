@@ -22,6 +22,22 @@
         </div>
     </div>
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
     <div class="card shadow">
         <div class="card-header bg-dark text-white">
             <h5 class="mb-0">System Users</h5>
@@ -75,24 +91,11 @@
                                     </td>
                                     <td>@userRole.User.CreatedAt.ToString("MMM dd, yyyy")</td>
                                     <td>
-                                        <div class="btn-group btn-group-sm">
-                                            @if (userRole.User.ApprovalStatus == ClinicAppointmentGroupProject.Models.ApprovalStatus.Pending)
-                                            {
-                                                <form method="post" asp-action="ApproveUser" class="d-inline">
-                                                    <input type="hidden" name="userId" value="@userRole.User.Id" />
-                                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                                                </form>
-                                                <form method="post" asp-action="RejectUser" class="d-inline">
-                                                    <input type="hidden" name="userId" value="@userRole.User.Id" />
-                                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                                                </form>
-                                            }
-                                            else if (userRole.Roles.Contains("Doctor"))
-                                            {
-                                                <button class="btn btn-outline-info btn-sm">View Schedule</button>
-                                            }
-                                            <button class="btn btn-outline-warning btn-sm">Reset Password</button>
-                                        </div>
+                                        <form method="post" asp-action="RemoveUser" class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to remove @userRole.User.FullName? This action cannot be undone.');">
+                                            <input type="hidden" name="userId" value="@userRole.User.Id" />
+                                            <button type="submit" class="btn btn-danger btn-sm">🗑 Remove</button>
+                                        </form>
                                     </td>
                                 </tr>
                             }

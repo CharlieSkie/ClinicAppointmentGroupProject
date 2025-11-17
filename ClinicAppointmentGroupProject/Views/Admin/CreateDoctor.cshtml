@@ -8,6 +8,14 @@
     <div class="card shadow-lg p-4 w-100" style="max-width: 600px;">
         <h3 class="text-center mb-4 fw-bold">👨‍⚕️ Add New Doctor</h3>
 
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
         <form asp-action="CreateDoctor" method="post">
             <div class="mb-3">
                 <label asp-for="FullName" class="form-label fw-semibold">Full Name</label>
@@ -34,12 +42,6 @@
                     <option>ENT</option>
                 </select>
                 <span asp-validation-for="Specialization" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="LicenseNumber" class="form-label fw-semibold">License Number</label>
-                <input asp-for="LicenseNumber" class="form-control" placeholder="Enter license number" />
-                <span asp-validation-for="LicenseNumber" class="text-danger"></span>
             </div>
 
             <div class="mb-3">

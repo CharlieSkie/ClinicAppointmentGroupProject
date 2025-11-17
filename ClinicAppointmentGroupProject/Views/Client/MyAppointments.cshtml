@@ -10,6 +10,22 @@
         <a asp-action="BookAppointment" class="btn btn-primary">📅 Book New Appointment</a>
     </div>
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
     <div class="card shadow">
         <div class="card-body">
             @if (Model.Any())
@@ -46,7 +62,11 @@
                                     <td>
                                         @if (appointment.Status == ClinicAppointmentGroupProject.Models.AppointmentStatus.Pending)
                                         {
-                                            <button class="btn btn-outline-danger btn-sm">Cancel</button>
+                                            <form method="post" asp-action="CancelAppointment" class="d-inline"
+                                                  onsubmit="return confirm('Are you sure you want to cancel this appointment? This action cannot be undone.');">
+                                                <input type="hidden" name="appointmentId" value="@appointment.appointmentId" />
+                                                <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                                            </form>
                                         }
                                         else
                                         {
